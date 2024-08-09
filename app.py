@@ -1,20 +1,10 @@
-import streamlit as st
+from flask import Flask, render_template
 
-def main():
-    st.title("Staff Image Recognition")
+app = Flask(__name__)
 
-    # Add a selectbox for page navigation
-    page = st.sidebar.selectbox("Choose a page", ["Image Classification", "Real-Time Staff Classification", "Edit Staff Info"])
+@app.route('/')
+def hello_world():
+    return render_template('index.html')
 
-    if page == "Image Classification":
-        import image_classification  # Import the image classification module
-        image_classification.run()
-    elif page == "Real-Time Staff Classification":
-        import real_time_classification  # Import the real-time classification module
-        real_time_classification.run()
-    elif page == "Edit Staff Info":
-        import edit_staff_info  # Import the edit staff info module
-        edit_staff_info.run()
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    app.run(debug=True)
