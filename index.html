@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Webcam Access</title>
+</head>
+<body>
+    <h1>Hello from Flask!</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display:none;"></canvas>
+    <script>
+        // Access the webcam and display the video feed
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                var video = document.getElementById('video');
+                video.srcObject = stream;
+                
+                // Continuously capture frames
+                var canvas = document.getElementById('canvas');
+                var context = canvas.getContext('2d');
+                
+                function captureFrame() {
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    
+                    // Send the frame to the server for detection
+                    canvas.toBlob(function(blob) {
+                        var formData = new FormData();
+                        formData.append('image', blob);
+                        
+                        fetch('/detect', {
+                            method: 'POST',
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Recognition Results:', data);
+                            // Process and display results
+                        });
+                    }, 'image/jpeg');
+                    
+                    requestAnimationFrame(captureFrame);
+                }
+                
+                captureFrame();
+            })
+            .catch(function(err) {
+                console.error("Error accessing the webcam: ", err);
+            });
+    </script>
+</body>
+</html>
